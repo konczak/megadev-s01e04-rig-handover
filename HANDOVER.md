@@ -82,3 +82,12 @@ status `fail`, `fixtures/refresh` 3 retries). Synthetic cases use a temp dir fro
 - `src/digest/read.ts` was NOT in this branch (a local stub was used and not committed); the route imports `readNight` from `./digest/read.js`, so it needs #2 merged to build.
 - #6 tests: look for text `nothing ran`, `could not be read`, `—`, and `class="flag"` on flagged rows.
 - The view is `DigestPage` in `src/views/digest.tsx`, props `{ night, rows, badLines }`.
+## #4 Digest JSON GET /api/digest/:night
+
+**What was done:** `GET /api/digest/:night` in `src/app.tsx`. It calls `readNight(config.runsDir, night)` and returns the `night` result as is: `{kind, night, rows, counts, badLines}`. Same rows, same order as the page, so they can't disagree. A night that fails `NIGHT_PATTERN` or reads as `missing` gives 404 with `{ "error": "no such night", "night": "<night>" }`.
+
+**Files:** `src/app.tsx`, `HANDOVER.md`.
+
+**How to check:** `pnpm typecheck` and `pnpm test`. With the app running, `curl localhost:8787/api/digest/2026-10-28` lists the same jobs, in the same order, as the page; `/api/digest/2026-01-01` and `/api/digest/nope` return 404. Depends on `readNight` from #2 (`src/digest/read.ts`); it was typechecked against a local stub that is not committed.
+
+**What the next parts must know:** the route has no tests yet (#6: use a temp runs dir via `createApp({...config, runsDir})`). The 404 body is JSON, unlike the page's 404.
