@@ -1,8 +1,9 @@
 ---
 plan: morning-digest
-status: ready
+status: done
 owner: rook
 opened: 2026-10-29
+closed: 2026-10-31
 ---
 
 # Morning digest
@@ -77,3 +78,16 @@ page again with `LANE_MARKER` unset (the banner reads "no marker set") and uploa
 link. Move this plan to `docs/plans/done/` with its issue list.
 
 Done when: the preview link no longer shows the lane marker.
+
+## Issues
+
+| # | Issue | Plan section |
+|---|-------|--------------|
+| [1](https://github.com/konczak/megadev-s01e04-rig-handover/issues/1) | Digest types contract (src/digest/types.ts) | 1 |
+| [2](https://github.com/konczak/megadev-s01e04-rig-handover/issues/2) | Run log reader | 1 |
+| [3](https://github.com/konczak/megadev-s01e04-rig-handover/issues/3) | Digest page GET /digest/:night | 2a |
+| [4](https://github.com/konczak/megadev-s01e04-rig-handover/issues/4) | Digest JSON GET /api/digest/:night | 2b |
+| [5](https://github.com/konczak/megadev-s01e04-rig-handover/issues/5) | Board links each night to its digest, with counts | 2c |
+| [6](https://github.com/konczak/megadev-s01e04-rig-handover/issues/6) | Digest route tests | 2d |
+| [7](https://github.com/konczak/megadev-s01e04-rig-handover/issues/7) | Preview for review | 3 |
+| [8](https://github.com/konczak/megadev-s01e04-rig-handover/issues/8) | Remove marker from preview, archive plan | 4 |

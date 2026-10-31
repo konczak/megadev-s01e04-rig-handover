@@ -123,3 +123,13 @@ status `fail`, `fixtures/refresh` 3 retries). Synthetic cases use a temp dir fro
 **Watch out for #8:** Netlify also serves every deploy at its own permalink (`<deploy-id>--megadev-s01e04-rig-preview.netlify.app`), and that link is public too. After the clean re-upload, delete the marked deploy, or the marker stays on a public link.
 
 **What the next part must know:** for plan § 4 run `pnpm preview:save -- --no-marker` (banner reads "no marker set"), then upload `var/preview/index.html` over the same link. Run plain `pnpm preview:save` to get the marked file again.
+
+## #8 Remove marker from preview, archive plan
+
+**What was done:** plan.md § 4. The page was saved again with `pnpm preview:save -- --no-marker` (banner reads "no marker set") and uploaded over the same link https://megadev-s01e04-rig-preview.netlify.app with `netlify deploy --prod --dir var/preview --site <site> --no-build`. The old marked deploy was deleted with `netlify api deleteDeploy`, because Netlify keeps every deploy on its own public permalink. The plan moved to `docs/plans/done/2026-10-31-morning-digest.md` (status `done`) with its issue list (#1-#8).
+
+**Files:** `docs/plans/done/2026-10-31-morning-digest.md` (moved from `plan.md`), `HANDOVER.md`. `var/preview/` stays git-ignored.
+
+**How to check:** `pnpm typecheck` and `pnpm exec vitest run --dir test` pass. Open the preview link: the banner reads "no marker set".
+
+**What the next part must know:** every review preview on Netlify needs both steps: the re-upload over the fixed link and deleting the older deploys. Otherwise old content stays on its permalink. Nothing left on a public link carries the marker.
