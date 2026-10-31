@@ -100,3 +100,12 @@ status `fail`, `fixtures/refresh` 3 retries). Synthetic cases use a temp dir fro
 **How to check:** `pnpm typecheck` and `pnpm test` pass; `GET /` shows `2026-10-28` as a link with counts. The link renders a page only once #3 lands.
 
 **What the next part must know:** `src/status.ts` imports `readNight` from `./digest/read.js` (#2). `readStatus` callers must `await` it. #6 can assert the board counts against a temp runs dir.
+## #6 Digest route tests
+
+**What was done:** route tests for `GET /digest/:night` (#3) and `GET /api/digest/:night` (#4) via `app.request()`, against a temp runs dir (mkdtemp in the OS temp dir, removed in afterAll; `runs/` untouched). Synthetic nights: normal (3 jobs, file order differs from sorted order, one null owner, a retry-then-ok job), empty file, one truncated line, and one night with no file.
+
+**Files:** `test/digest-routes.test.tsx` (new), `HANDOVER.md`.
+
+**How to check:** `pnpm test`. Needs #2, #3 and #4 merged; before that the digest tests fail with 404. Covered: 200, 404 (missing and invalid night; the API 404 is application/json), empty night ("nothing ran" / `rows: []`), bad line (`badLines: 1`, good rows kept), and page and JSON list the same jobs in the same order. Markup is only asserted for job names, "nothing ran", the em dash and status codes.
+
+**What the next part must know:** the tests set no env vars. They assume the reader's sorted job order (`digest/render`, `lane/backup`, `lane/sync`). Failure marking (retries >= 3 or fail) is not asserted because the markup is not fixed.
