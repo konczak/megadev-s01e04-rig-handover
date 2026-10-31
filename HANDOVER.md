@@ -91,3 +91,12 @@ status `fail`, `fixtures/refresh` 3 retries). Synthetic cases use a temp dir fro
 **How to check:** `pnpm typecheck` and `pnpm test`. With the app running, `curl localhost:8787/api/digest/2026-10-28` lists the same jobs, in the same order, as the page; `/api/digest/2026-01-01` and `/api/digest/nope` return 404. Depends on `readNight` from #2 (`src/digest/read.ts`); it was typechecked against a local stub that is not committed.
 
 **What the next parts must know:** the route has no tests yet (#6: use a temp runs dir via `createApp({...config, runsDir})`). The 404 body is JSON, unlike the page's 404.
+## #5 Board links each night to its digest, with counts
+
+**What was done:** the status board (`GET /`) lists each night on disk as a link to `/digest/<night>` with `ok N · retry N · fail N` beside it, from `readNight(...).counts`. A `missing` result shows `—` for the three numbers. Server-rendered, no client JS.
+
+**Files:** `src/status.ts` (`readStatus` is now async; `Status.nights` is `{ night, counts: Counts | null }[]`), `src/views/status.tsx`, `src/app.tsx` (`await readStatus`), `HANDOVER.md`.
+
+**How to check:** `pnpm typecheck` and `pnpm test` pass; `GET /` shows `2026-10-28` as a link with counts. The link renders a page only once #3 lands.
+
+**What the next part must know:** `src/status.ts` imports `readNight` from `./digest/read.js` (#2). `readStatus` callers must `await` it. #6 can assert the board counts against a temp runs dir.
