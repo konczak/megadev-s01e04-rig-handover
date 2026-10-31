@@ -67,3 +67,18 @@ status `fail`, `fixtures/refresh` 3 retries). Synthetic cases use a temp dir fro
 - On `runs/2026-10-28.jsonl`: `lane/sync` ends `ok` with `lastError: 'lock held'`, and
   `fixtures/refresh` ends `ok` with `lastError: 'upstream 503'` (runs 4, retries 3).
 - The result is plain JSON-safe data: #4 can `c.json(result)` as is.
+
+## #3 Digest page GET /digest/:night
+
+**What was done:** `GET /digest/:night` renders one night as a table (job, owner, runs, retries, last status, last error, first, last), rows in the order `readNight` returns (sorted by job). 404 when `:night` fails `NIGHT_PATTERN` or the result is `missing`. Empty night renders "nothing ran". `badLines > 0` shows "N line(s) could not be read". `null` owner / lastError render as `—`. Times verbatim. No client JS.
+
+**Marking:** rows with `retries >= 3` or `lastStatus === 'fail'` get class `flag` (warn colour, bold) plus a visible `! ` before the job; `retries >= 3` also appends ` (many)` to the retries cell.
+
+**Files:** `src/views/digest.tsx` (new), `src/app.tsx` (route + imports), `src/views/layout.tsx` (`tr.flag` style), `HANDOVER.md`.
+
+**How to check:** `pnpm typecheck`, `pnpm test`; with #2 merged, `pnpm dev` and open `/digest/2026-10-28` (5 jobs, `digest/render` owner `—`, "1 line could not be read"). `/digest/nope` and a night without a file give 404.
+
+**What the next parts must know:**
+- `src/digest/read.ts` was NOT in this branch (a local stub was used and not committed); the route imports `readNight` from `./digest/read.js`, so it needs #2 merged to build.
+- #6 tests: look for text `nothing ran`, `could not be read`, `—`, and `class="flag"` on flagged rows.
+- The view is `DigestPage` in `src/views/digest.tsx`, props `{ night, rows, badLines }`.
