@@ -41,3 +41,29 @@ Per part:
   that fails `NIGHT_PATTERN`. JSON = the `night` result as is, so page and JSON can't disagree.
 - **#5 board:** use `counts` for the ok / retry / fail numbers beside each night.
 - **#6 tests:** use a temp runs dir, never `runs/`.
+
+## #2 Run log reader
+
+**What was done:** `export const readNight: ReadNight` (plan.md § 1), per the #1 contract.
+Lines are split on `\r?\n` (CRLF and a trailing newline are fine; a leading BOM is dropped).
+Blank / whitespace-only lines are ignored. Every other line is `JSON.parse`d and validated
+(object; string `at`, string `job`, `status` in `ok | retry | fail`, `owner` present and string or
+`null`, `error` absent or string); anything else increments `badLines`, never throws. Rows are
+sorted by `job` with a plain `<` compare. Times are copied verbatim.
+
+**Files:** `src/digest/read.ts` (new), `test/digest-read.test.ts` (new), `HANDOVER.md`.
+
+**How to check:** `pnpm typecheck` and `pnpm test` (7 tests in 2 files). The fixture test reads
+`runs/2026-10-28.jsonl` (5 jobs, 1 bad line, `digest/render` owner `null`, `notes/backup` last
+status `fail`, `fixtures/refresh` 3 retries). Synthetic cases use a temp dir from `os.tmpdir()`.
+
+**What the next parts must know.**
+
+- Import `readNight` from `src/digest/read.ts` (`'./digest/read.js'` from `src/app.tsx`).
+- A `night` that fails `NIGHT_PATTERN` returns `{ kind: 'missing', night }` without building a
+  path or touching the disk, so a route can 404 on `missing` alone. Validating first is still fine.
+- `missing` means "no file" only (ENOENT / ENOTDIR). Other I/O errors (e.g. permissions) reject
+  the promise; let Hono turn them into a 500.
+- On `runs/2026-10-28.jsonl`: `lane/sync` ends `ok` with `lastError: 'lock held'`, and
+  `fixtures/refresh` ends `ok` with `lastError: 'upstream 503'` (runs 4, retries 3).
+- The result is plain JSON-safe data: #4 can `c.json(result)` as is.
