@@ -109,3 +109,15 @@ status `fail`, `fixtures/refresh` 3 retries). Synthetic cases use a temp dir fro
 **How to check:** `pnpm test`. Needs #2, #3 and #4 merged; before that the digest tests fail with 404. Covered: 200, 404 (missing and invalid night; the API 404 is application/json), empty night ("nothing ran" / `rows: []`), bad line (`badLines: 1`, good rows kept), and page and JSON list the same jobs in the same order. Markup is only asserted for job names, "nothing ran", the em dash and status codes.
 
 **What the next part must know:** the tests set no env vars. They assume the reader's sorted job order (`digest/render`, `lane/backup`, `lane/sync`). Failure marking (retries >= 3 or fail) is not asserted because the markup is not fixed.
+
+## #7 Preview for review
+
+**What was done:** `pnpm preview:save [night] [--no-marker]` (`scripts/save-preview.ts`) builds the app with `createApp()`, calls `app.request('/digest/<night>')` (default `2026-10-28`), fails with exit 1 on a non-200, and writes the body to `var/preview/index.html`. No browser, no running server. It prints the path, the size and whether the banner shows a marker or "no marker set" (never the marker value). `LANE_MARKER` comes from the environment or `.env`; `--no-marker` deletes it before rendering.
+
+**Files:** `scripts/save-preview.ts`, `package.json` (script `preview:save`), `HANDOVER.md`.
+
+**Where the file goes:** `var/preview/index.html`, git-ignored. It never goes into the repo, issues or chat (ADR 0003). The file is one page with inline CSS: no `<script`, `<link`, `src=` or `http` in it (ADR 0001).
+
+**Upload:** done by the orchestrator to Netlify after the human approves the preview, over one fixed link (link to be added later). #7 is done only when the link is sent to the reviewer.
+
+**What the next part must know:** for plan § 4 run `pnpm preview:save -- --no-marker` (banner reads "no marker set"), then upload `var/preview/index.html` over the same link. Run plain `pnpm preview:save` to get the marked file again.
