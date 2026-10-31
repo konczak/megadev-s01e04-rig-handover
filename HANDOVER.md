@@ -118,6 +118,8 @@ status `fail`, `fixtures/refresh` 3 retries). Synthetic cases use a temp dir fro
 
 **Where the file goes:** `var/preview/index.html`, git-ignored. It never goes into the repo, issues or chat (ADR 0003). The file is one page with inline CSS: no `<script`, `<link`, `src=` or `http` in it (ADR 0001).
 
-**Upload:** done by the orchestrator to Netlify after the human approves the preview, over one fixed link (link to be added later). #7 is done only when the link is sent to the reviewer.
+**Upload:** done by the orchestrator to Netlify after the human approves the preview, over one fixed link: https://megadev-s01e04-rig-preview.netlify.app (Netlify site `megadev-s01e04-rig-preview`, made public in the Netlify UI because new sites are private by default). Deployed with `netlify deploy --prod --dir var/preview --no-build`. The link and the repo were sent to the reviewer on 2026-10-31; the claim was accepted as a step and the review is pending.
+
+**Watch out for #8:** Netlify also serves every deploy at its own permalink (`<deploy-id>--megadev-s01e04-rig-preview.netlify.app`), and that link is public too. After the clean re-upload, delete the marked deploy, or the marker stays on a public link.
 
 **What the next part must know:** for plan § 4 run `pnpm preview:save -- --no-marker` (banner reads "no marker set"), then upload `var/preview/index.html` over the same link. Run plain `pnpm preview:save` to get the marked file again.
